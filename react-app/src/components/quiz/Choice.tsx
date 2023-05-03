@@ -1,30 +1,31 @@
-import React from 'react'
-
+import React from "react";
+import { QuestionSet } from "../../models/questionSet";
 interface ChoiceProps {
-  choices: string[]
-  optionalProp?: string
+  questionSet: QuestionSet;
+  optionalProp?: string;
 }
 
-function Choice({ choices, optionalProp }: ChoiceProps) {
-  const format = (choice: string) => '-' + choice + '-'
+function Choice({ questionSet, optionalProp }: ChoiceProps) {
+  const format = (choice: string) => " " + choice + " ";
 
   const handleOnClick = (c: string) => {
-    alert(c)
-  }
+    alert(c);
+  };
 
   return (
     <div>
-      {choices.map((c) => (
+      {questionSet.Choices.map((c, index) => (
         <button
           onClick={() => {
-            handleOnClick(c)
+            handleOnClick(c);
           }}
+          key={index}
         >
           {format(c)}
         </button>
       ))}
     </div>
-  )
+  );
 }
 
-export default Choice
+export default Choice;

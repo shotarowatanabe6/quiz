@@ -1,44 +1,55 @@
-import React, { useState } from 'react'
-import Question from '../components/quiz/Question'
-import Choice from '../components/quiz/Choice'
-import { getQuestionSet } from '../services/getQuestionSet'
-import { QuestionSetType } from '../models/questionSetType'
+import React, { useState } from "react";
+import Question from "../components/quiz/Question";
+import Choice from "../components/quiz/Choice";
+import { QuestionSet } from "../models/questionSet";
+import axios, { AxiosResponse } from "axios";
 
-function GameField() {
-  const [questionSet, setQuestionSet] = useState<QuestionSetType>({
-    id: '',
-    question: '',
-    choices: [''],
-    answer: {
-      choiceIndex: 0,
-      text: ''
+async function getQuestionSet(): Promise<QuestionSet> {
+  try {
+    const url = "http://localhost:8080/question";
+    const response: AxiosResponse<{ questionSet: QuestionSet }> =
+      await axios.get(url);
+    if (response.data) {
+      return response.data.questionSet;
+    } else {
+      throw new Error("Unexpected API response");
     }
-  })
-
-  const onClickGetQuestionSet = async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    event.preventDefault()
-    const data = await getQuestionSet()
-    setQuestionSet(data)
-    // handle success or error
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
-
-  // const questionSetData = {
-  //   question: '問題',
-  //   choices: ['選択肢1', '選択肢2', '選択肢3', '選択肢4'],
-  //   answer: {
-  //     choiceIndex: 3,
-  //     text: '選択肢3'
-  //   }
-  // }
-
-  const { question, choices } = questionSet
-  return (
-    <div>
-      <Question question={question} />
-      <Choice choices={choices} />
-      <button onClick={onClickGetQuestionSet}>問題を取得</button>
-    </div>
-  )
 }
 
-export default GameField
+const GameField: React.FC = () => {
+  const [questionSet, setQuestionSet] = useState<QuestionSet>({
+    Id: "",
+    Question: "",
+    Choices: [],
+    Answer: {
+      ChoiceIndex: 0,
+      Text: "",
+    },
+  });
+
+  const onClickGetQuestionSet = (
+    e: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    e.preventDefault(); // フォームのデフォルトの動作（リロード）を防ぐ
+    (async () => {
+      const q = await getQuestionSet();
+      if (q) {
+        setQuestionSet(q);
+      }
+    })();
+  };
+
+  return (
+    <div>
+      <Question questionSet={questionSet} />
+      <Choice questionSet={questionSet} />
+      <button onClick={onClickGetQuestionSet}>問題を取得</button>
+    </div>
+  );
+};
+
+export default GameField;

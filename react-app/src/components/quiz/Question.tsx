@@ -1,12 +1,12 @@
-import React from 'react'
-
+import React from "react";
+import { QuestionSet } from "../../models/questionSet";
 interface QuestionProps {
-  question: string
-  optionalProp?: string
+  questionSet: QuestionSet;
+  optionalProp?: string;
 }
 
-function Question({ question, optionalProp }: QuestionProps) {
-  return <div>{question}</div>
+function Question({ questionSet, optionalProp }: QuestionProps) {
+  return <div>{questionSet.Question}</div>;
 }
 
-export default Question
+export default Question;
