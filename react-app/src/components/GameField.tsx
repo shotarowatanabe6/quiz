@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import axios, { AxiosResponse } from "axios";
+
+import Operation from "./Operation";
+import Chat from "./Chat";
 import Question from "../components/quiz/Question";
 import Choice from "../components/quiz/Choice";
 import { QuestionSet } from "../models/questionSet";
-import axios, { AxiosResponse } from "axios";
 
 async function getQuestionSet(): Promise<QuestionSet> {
   try {
@@ -21,6 +24,18 @@ async function getQuestionSet(): Promise<QuestionSet> {
 }
 
 const GameField: React.FC = () => {
+  const [entered, setEntered] = useState(false);
+  const [name, setName] = useState("");
+
+  const handleEnter = (name: string) => {
+    setEntered(true);
+    setName(name);
+  };
+
+  const handleLeave = () => {
+    setEntered(false);
+  };
+
   const [questionSet, setQuestionSet] = useState<QuestionSet>({
     Id: "",
     Question: "",
@@ -44,11 +59,21 @@ const GameField: React.FC = () => {
   };
 
   return (
-    <div>
-      <Question questionSet={questionSet} />
-      <Choice questionSet={questionSet} />
-      <button onClick={onClickGetQuestionSet}>問題を取得</button>
-    </div>
+    <>
+      <div>
+        <Question questionSet={questionSet} />
+        <Choice questionSet={questionSet} />
+        <button onClick={onClickGetQuestionSet}>問題を取得</button>
+      </div>
+      <div>
+        <Operation
+          onEnter={handleEnter}
+          onLeave={handleLeave}
+          entered={entered}
+        />
+        {entered && <Chat name={name} />}
+      </div>
+    </>
   );
 };
 
