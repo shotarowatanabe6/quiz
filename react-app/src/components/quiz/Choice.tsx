@@ -36,8 +36,8 @@ function Choice({
   }, [userAnswer, correctAnswer, result]);
 
   const handleOnClick = (c: string) => {
-    setUserAnswer(c);
     setChoicesDisabled(true);
+    setUserAnswer(c);
   };
 
   return (

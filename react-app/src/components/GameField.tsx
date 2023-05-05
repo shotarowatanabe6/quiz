@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios, { AxiosResponse } from "axios";
 import io, { Socket } from "socket.io-client";
 
 import Operation from "./Operation";
@@ -7,22 +6,7 @@ import Chat from "./Chat";
 import Question from "../components/quiz/Question";
 import Choice from "../components/quiz/Choice";
 import { QuestionSet } from "../models/questionSet";
-
-async function getQuestionSet(): Promise<QuestionSet> {
-  try {
-    const url = "http://localhost:8080/question";
-    const response: AxiosResponse<{ questionSet: QuestionSet }> =
-      await axios.get(url);
-    if (response.data) {
-      return response.data.questionSet;
-    } else {
-      throw new Error("Unexpected API response");
-    }
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
+import GetQuestionSet from "../services/getQuestionSet";
 
 const initialQuestionSet = {
   Id: "",
@@ -52,7 +36,7 @@ const GameField: React.FC = () => {
     // APIを叩きquestionSetを取得する
     (async () => {
       try {
-        const q = await getQuestionSet();
+        const q = await GetQuestionSet();
         if (q) {
           console.log(q);
           setQuestionSet(q);
