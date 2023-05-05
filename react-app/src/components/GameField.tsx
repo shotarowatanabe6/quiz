@@ -61,10 +61,11 @@ const GameField: React.FC = () => {
   return (
     <>
       <div>
+        <button onClick={onClickGetQuestionSet}>問題を取得</button>
         <Question questionSet={questionSet} />
         <Choice questionSet={questionSet} />
-        <button onClick={onClickGetQuestionSet}>問題を取得</button>
       </div>
+      <hr></hr>
       <div>
         <Operation
           onEnter={handleEnter}

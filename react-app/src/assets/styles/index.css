@@ -26,9 +26,8 @@ input {
 }
 
 button {
-  width: 80px;
   height: 2rem;
-  padding: 0.2rem;
+  padding: 0.4rem, 0.4rem;
   border-radius: 2px;
   background-color: powderblue;
 }
