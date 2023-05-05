@@ -1,4 +1,6 @@
 {
   "go.lintTool": "golangci-lint",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "go.formatTool": "default",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

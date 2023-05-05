@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Result from "./Result";
 import { QuestionSetAnswer } from "../../models/questionSet";
+import PostSelectedChoice from "../../services/postSelectedChoice";
 
 interface ChoiceProps {
   choices: string[];
@@ -38,6 +39,17 @@ function Choice({
   const handleOnClick = (c: string) => {
     setChoicesDisabled(true);
     setUserAnswer(c);
+
+    (async () => {
+      try {
+        const q = await PostSelectedChoice();
+        if (q) {
+          console.log(q);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
   };
 
   return (
