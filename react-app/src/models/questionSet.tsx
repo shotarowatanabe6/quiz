@@ -7,3 +7,8 @@ export interface QuestionSet {
     Text: string;
   };
 }
+
+export interface QuestionSetAnswer {
+  ChoiceIndex: number;
+  Text: string;
+}

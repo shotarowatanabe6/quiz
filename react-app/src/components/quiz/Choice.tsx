@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from "react";
 import Result from "./Result";
-import { QuestionSet } from "../../models/questionSet";
+import { QuestionSetAnswer } from "../../models/questionSet";
 
 interface ChoiceProps {
-  questionSet: QuestionSet;
-  optionalProp?: string;
+  choices: string[];
+  answer: QuestionSetAnswer;
+  buttonDisabled: boolean;
+  setChoicesDisabled: (value: boolean) => void;
 }
 
-function Choice({ questionSet, optionalProp }: ChoiceProps) {
+function Choice({
+  choices,
+  answer,
+  buttonDisabled,
+  setChoicesDisabled,
+}: ChoiceProps) {
   const format = (choice: string) => " " + choice + " ";
   const isCorrectAnswer = (correctAnswer: string, userAnswer: string) => {
     return correctAnswer === userAnswer;
   };
-  const correctAnswer = questionSet.Answer.Text;
+  const correctAnswer = answer.Text;
 
   const [userAnswer, setUserAnswer] = useState("");
-  const [result, setResult] = useState<string | undefined>();
+  const [result, setResult] = useState<string>("");
 
   useEffect(() => {
     if (userAnswer === "") {
@@ -26,21 +33,22 @@ function Choice({ questionSet, optionalProp }: ChoiceProps) {
     } else {
       setResult("Incorrect");
     }
-    console.log(userAnswer, correctAnswer, result);
   }, [userAnswer, correctAnswer, result]);
 
-  const handleOnClick = (questionSet: QuestionSet, c: string) => {
+  const handleOnClick = (c: string) => {
     setUserAnswer(c);
+    setChoicesDisabled(true);
   };
 
   return (
     <div>
-      {questionSet.Choices.map((c, index) => (
+      {choices.map((c, index) => (
         <button
           onClick={() => {
-            handleOnClick(questionSet, c);
+            handleOnClick(c);
           }}
           key={index}
+          disabled={buttonDisabled}
         >
           {format(c)}
         </button>

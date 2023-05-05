@@ -1,3 +1,6 @@
+import { useState, useEffect, useRef } from "react";
+import io, { Socket } from "socket.io-client";
+
 import SendMessage from "../components/SendMessage";
 import GameField from "../components/GameField";
 

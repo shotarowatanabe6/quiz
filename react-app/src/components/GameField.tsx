@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios, { AxiosResponse } from "axios";
+import io, { Socket } from "socket.io-client";
 
 import Operation from "./Operation";
 import Chat from "./Chat";
@@ -23,47 +24,91 @@ async function getQuestionSet(): Promise<QuestionSet> {
   }
 }
 
+const initialQuestionSet = {
+  Id: "",
+  Question: "",
+  Choices: [],
+  Answer: {
+    ChoiceIndex: 0,
+    Text: "",
+  },
+};
+
 const GameField: React.FC = () => {
   const [entered, setEntered] = useState(false);
   const [name, setName] = useState("");
+  const [buttonDisabled, setChoicesDisabled] = useState(true);
+  const [questionSet, setQuestionSet] =
+    useState<QuestionSet>(initialQuestionSet);
+  const [question, setQuestion] = useState<string>("");
+  const [choices, setChoices] = useState<string[]>([]);
+
+  const socketRef = useRef<Socket>(io("http://localhost:3001"));
+
+  const onClickShowQuestion = (
+    e: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    e.preventDefault(); // フォームのデフォルトの動作（リロード）を防ぐ
+    // APIを叩きquestionSetを取得する
+    (async () => {
+      try {
+        const q = await getQuestionSet();
+        if (q) {
+          console.log(q);
+          setQuestionSet(q);
+          socketRef.current?.emit("showQuestion", q.Question);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  };
+
+  useEffect(() => {
+    socketRef.current.on("connect", () => {
+      socketRef.current.emit("join", {
+        name: name,
+      });
+    });
+    socketRef.current.on("showQuestion", (question: string) => {
+      setQuestion(question);
+      console.log(question);
+    });
+    socketRef.current.on("showChoices", (choices: string[]) => {
+      setChoices(choices);
+      console.log(choices);
+      setChoicesDisabled(false);
+    });
+    socketRef.current.on("disconnect", () => {
+      socketRef.current.disconnect();
+    });
+  }, []);
+
+  const onClickShowChoices = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.preventDefault(); // フォームのデフォルトの動作（リロード）を防ぐ
+    socketRef.current?.emit("showChoices", questionSet.Choices);
+  };
 
   const handleEnter = (name: string) => {
     setEntered(true);
     setName(name);
   };
-
   const handleLeave = () => {
     setEntered(false);
-  };
-
-  const [questionSet, setQuestionSet] = useState<QuestionSet>({
-    Id: "",
-    Question: "",
-    Choices: [],
-    Answer: {
-      ChoiceIndex: 0,
-      Text: "",
-    },
-  });
-
-  const onClickGetQuestionSet = (
-    e: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    e.preventDefault(); // フォームのデフォルトの動作（リロード）を防ぐ
-    (async () => {
-      const q = await getQuestionSet();
-      if (q) {
-        setQuestionSet(q);
-      }
-    })();
   };
 
   return (
     <>
       <div>
-        <button onClick={onClickGetQuestionSet}>問題を取得</button>
-        <Question questionSet={questionSet} />
-        <Choice questionSet={questionSet} />
+        <button onClick={onClickShowQuestion}>問題を表示</button>
+        <button onClick={onClickShowChoices}>選択肢を表示</button>
+        <Question question={question} />
+        <Choice
+          choices={choices}
+          answer={questionSet.Answer}
+          buttonDisabled={buttonDisabled}
+          setChoicesDisabled={setChoicesDisabled}
+        />
       </div>
       <hr></hr>
       <div>
